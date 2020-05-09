@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { fetchPosts } from '../actions/postsActions'
+import { fetchPosts, postsSelector } from '../slices/posts'
 
 import { Post } from '../components/Post'
 
-const PostsPage = ({ dispatch, loading, posts, hasErrors }) => {
+const PostsPage = () => {
+  const dispatch = useDispatch()
+  const { posts, loading, hasErrors } = useSelector(postsSelector)
+
   useEffect(() => {
     dispatch(fetchPosts())
   }, [dispatch])
@@ -25,10 +28,4 @@ const PostsPage = ({ dispatch, loading, posts, hasErrors }) => {
   )
 }
 
-const mapStateToProps = state => ({
-  loading: state.posts.loading,
-  posts: state.posts.posts,
-  hasErrors: state.posts.hasErrors,
-})
-
-export default connect(mapStateToProps)(PostsPage)
+export default PostsPage

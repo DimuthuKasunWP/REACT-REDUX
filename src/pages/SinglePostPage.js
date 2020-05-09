@@ -1,20 +1,23 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { fetchPost } from '../actions/postActions'
-import { fetchComments } from '../actions/commentsActions'
+import { fetchPost, postSelector } from '../slices/post'
+import { fetchComments, commentsSelector } from '../slices/comments'
 
 import { Post } from '../components/Post'
 import { Comment } from '../components/Comment'
 
-const SinglePostPage = ({
-  match,
-  dispatch,
-  post,
-  comments,
-  hasErrors,
-  loading,
-}) => {
+const SinglePostPage = ({ match }) => {
+  const dispatch = useDispatch()
+  const { post, loading: postLoading, hasErrors: postHasErrors } = useSelector(
+    postSelector
+  )
+  const {
+    comments,
+    loading: commentsLoading,
+    hasErrors: commentsHasErrors,
+  } = useSelector(commentsSelector)
+
   useEffect(() => {
     const { id } = match.params
 
@@ -23,15 +26,15 @@ const SinglePostPage = ({
   }, [dispatch, match])
 
   const renderPost = () => {
-    if (loading.post) return <p>Loading post...</p>
-    if (hasErrors.post) return <p>Unable to display post.</p>
+    if (postLoading) return <p>Loading post...</p>
+    if (postHasErrors) return <p>Unable to display post.</p>
 
     return <Post post={post} />
   }
 
   const renderComments = () => {
-    if (loading.comments) return <p>Loading comments...</p>
-    if (hasErrors.comments) return <p>Unable to display comments.</p>
+    if (commentsLoading) return <p>Loading comments...</p>
+    if (commentsHasErrors) return <p>Unable to display comments.</p>
 
     return comments.map(comment => (
       <Comment key={comment.id} comment={comment} />
@@ -47,11 +50,4 @@ const SinglePostPage = ({
   )
 }
 
-const mapStateToProps = state => ({
-  post: state.post.post,
-  comments: state.comments.comments,
-  loading: { post: state.post.loading, comments: state.comments.loading },
-  hasErrors: { post: state.post.hasErrors, comments: state.comments.hasErrors },
-})
-
-export default connect(mapStateToProps)(SinglePostPage)
+export default SinglePostPage
